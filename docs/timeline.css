@@ -1,0 +1,180 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #252525;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  /* 水平居中 */
+  align-items: center;
+  /* 垂直居中 */
+  min-height: 100vh;
+}
+
+.title {
+  width: 50%;
+  /* 设置宽度 */
+  margin: 0 auto;
+  /* 居中对齐 */
+  font-size: 30px;
+  font-weight: bold;
+  margin-left: 256px;
+  color: #11aaCC;
+  /* 魔法时代 设置字体颜色 */
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.magicage {
+  color: #BBaaCC;
+  /* 魔法时代 设置字体颜色 */
+}
+
+.goldenage {
+  color: #c8d608e3;
+  /*黄金时代  设置字体颜色 */
+}
+
+/** 危机纪元：不使用 **/
+.crisisage {
+  color: #34AD9C;
+  /* 危机纪元  设置字体颜色 */
+}
+
+.prestigeage {
+  color: #34AD9C;
+  /* 威摄纪元  设置字体颜色 */
+}
+
+.afterprestigeage {
+  color: #D4AD7C;
+  /* 威摄后时代  设置字体颜色 */
+}
+
+.broadcastage {
+  color: #E41DFC;
+  /* 广播纪元 设置字体颜色 */
+}
+
+.bunkerage {
+  color: #06458d;
+  /* 掩体纪元 设置字体颜色 */
+}
+
+.galacticage {
+  color: #13a5af;
+  /* 银河纪元  设置字体颜色 */
+}
+
+.dx3906age {
+  color: #1da89d;
+  /* DX3906星系黑域纪元   设置字体颜色 */
+}
+
+.universe647 {
+  color: #025e3f;
+  /* 647宇宙时间线    设置字体颜色 */
+}
+
+/* Timeline styles */
+.timeline {
+  position: relative;
+  margin: 50px 0;
+  padding: 0;
+  list-style: none;
+  font-weight: bold;
+  margin-bottom: 20px;   /* 增加间隔 */
+  margin-left: 300px;
+  color: #e9370b;   /* 危机时代 设置字体颜色 */
+}
+
+.timeline:before {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 40px;
+  content: "";
+  width: 3px;
+  background-color: aqua;
+  /* Adjust timeline color here */
+  margin-left: -1px;
+}
+
+.timeline-item {
+  margin-bottom: 50px;
+  position: relative;
+}
+
+.timeline-item:before,
+.timeline-item:after {
+  content: "";
+  display: table;
+}
+
+.timeline-item:after {
+  clear: both;
+}
+
+.timeline-item:last-of-type {
+  margin-bottom: 0;
+}
+
+.timeline-date {
+  display: inline-block;
+  width: 200px;
+  font-weight: bold;
+  margin-bottom: 9px;
+  margin-left: -170px;
+  margin-right: 200px;
+  text-align: right;
+  /* 右对齐 */
+}
+
+.timeline-content {
+  display: inline-block;
+  width: calc(100% - 120px);
+  padding-left: 90px;
+  position: relative;
+  top: -25px;
+  /* color:#da8454; */
+}
+
+.timeline-content:before {
+  position: absolute;
+  top: 0;
+  left: 50px;
+  display: inline-block;
+  border-radius: 50%;
+  border: 2px solid #AADDFF;
+  /* Adjust timeline circle color here */
+  background-color: #ffAf33;
+  /* Adjust timeline circle color here */
+  content: "";
+  height: 20px;
+  width: 20px;
+  text-align: center;
+  line-height: 20px;
+  font-weight: bold;
+}
+
+@media screen and (max-width: 600px) {
+  .timeline-date {
+    width: 60px;
+    font-size: 12px;
+  }
+
+  .timeline-content {
+    width: calc(100% - 80px);
+    font-size: 14px;
+    padding-left: 10px;
+    top: -3px;
+  }
+
+  .timeline-content:before {
+    left: 0;
+  }
+}
