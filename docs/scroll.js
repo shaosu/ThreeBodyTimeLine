@@ -33,7 +33,7 @@
       // 滚动到指定位置
       function scrollToPosition(currentPosition, targetPosition) {
         const distance =( targetPosition - currentPosition); // Math.abs
-        const duration = 3000; // 滚动时间（毫秒）
+        const duration = 6000; // 滚动时间（毫秒）
         const speed = 0.5; // 滚动速度（像素/毫秒）
         let currentTime = 0;
 
