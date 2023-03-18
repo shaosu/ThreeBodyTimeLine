@@ -9,7 +9,36 @@ body {
   align-items: center;
   /* 垂直居中 */
   min-height: 100vh;
+  background-image: url("BG.png");
+  background-size: contain;
+  background-repeat: repeat-y;
 }
+
+ #scroll-to-bottom-btn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: #007bff;
+        color: #fff;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        display: block;
+      }
+
+#scroll-to-top-btn {
+        position: fixed;
+        bottom: 80px;
+        right: 20px;
+        background-color: #007bff;
+        color: #fff;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        display: none;
+      }
 
 .title {
   width: 50%;
