@@ -1,60 +1,125 @@
+/* 回到顶部 / 底部按钮
+   --------------------------------------------------------------------------
+   - 点击「滚动到底部」/「滚动到顶部」：平滑滚动到目标位置
+   - 滚动过程中按钮切换为「停止滚动」，再次点击立即停下
+   - 期间用户自己滚轮 / 触摸滑动，也会中断动画
+   -------------------------------------------------------------------------- */
+(function () {
+  'use strict';
 
-      // 获取按钮元素
-      const scrollToBottomBtn = document.getElementById("scroll-to-bottom-btn");
-      const scrollToTopBtn = document.getElementById("scroll-to-top-btn");
+  var topBtn = document.getElementById('scroll-to-top-btn');
+  var bottomBtn = document.getElementById('scroll-to-bottom-btn');
+  if (!topBtn || !bottomBtn) { return; }
 
-      // 添加单击事件监听器
-      scrollToBottomBtn.addEventListener("click", () => {
-        // 滚动到页面底部
-        scrollToPosition(0, document.body.scrollHeight);
-      });
+  var LABEL = {
+    top: '滚动到顶部',
+    bottom: '滚动到底部',
+    stop: '停止滚动'
+  };
 
-      scrollToTopBtn.addEventListener("click", () => {
-        // 滚动到页面顶部
-        scrollToPosition(document.body.scrollHeight, 0);
-      });
+  var SHOW_TOP_AFTER = 240;   // 向下滚过这个距离才显示「滚动到顶部」
 
-      // 监听窗口滚动事件
-      window.addEventListener("scroll", () => {
-        // 如果滚动高度超过页面高度的一半，显示按钮，否则隐藏按钮
-        if (window.scrollY > document.body.scrollHeight / 2) {
-          scrollToBottomBtn.style.display = "none";
-        } else {
-          scrollToBottomBtn.style.display = "block";
-        }
+  // 恒定滚动速度（像素 / 毫秒），数值越小越慢
+  var SPEED = 0.2;
 
-        if (window.scrollY > document.body.scrollHeight / 2) {
-          scrollToTopBtn.style.display = "block";
-        } else {
-          scrollToTopBtn.style.display = "none";
-        }
-      });
+  var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-      // 滚动到指定位置
-      function scrollToPosition(currentPosition, targetPosition) {
-        const distance =( targetPosition - currentPosition); // Math.abs
-        const duration = 6000; // 滚动时间（毫秒）
-        const speed = 0.5; // 滚动速度（像素/毫秒）
-        let currentTime = 0;
+  var rafId = 0;              // 非 0 表示动画进行中
+  var direction = 0;          // 1 向下，-1 向上
+  var maxScroll = 0;
+  var lastKey = '';
 
-        if (distance <0)
-             currentTime =200;
+  function refreshMax() {
+    maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+  }
 
-        function easeOutQuad(curtime, curpos, dis, dur) {
+  function render() {
+    var running = rafId !== 0;
+    var showTop = window.scrollY > SHOW_TOP_AFTER;
+    var showBottom = window.scrollY < maxScroll - 4;
+    var key = running ? 'run' + direction : 'idle' + showTop + showBottom;
 
-             console.log(dis * curtime / dur + curpos);
-             return  dis * curtime / dur + curpos; //  linear   -12046*curtime/3000+12046
-        }
+    if (key === lastKey) { return; }   // 状态没变化就不碰 DOM
+    lastKey = key;
 
-        function animateScroll() {
-          currentTime += 1;
-          const newPosition = easeOutQuad(currentTime, currentPosition, distance, duration);
-          window.scrollTo(0, newPosition);
+    document.body.classList.toggle('is-scrolling', running);
 
-          if (currentTime < duration) {
-            requestAnimationFrame(animateScroll);
-          }
-        }
+    if (running) {
+      // 滚动中只保留发起滚动的那个按钮，并切换为「停止滚动」
+      topBtn.textContent = LABEL.stop;
+      bottomBtn.textContent = LABEL.stop;
+      topBtn.style.display = direction < 0 ? 'block' : 'none';
+      bottomBtn.style.display = direction > 0 ? 'block' : 'none';
+      return;
+    }
 
-        animateScroll();
+    topBtn.textContent = LABEL.top;
+    bottomBtn.textContent = LABEL.bottom;
+    topBtn.style.display = showTop ? 'block' : 'none';
+    bottomBtn.style.display = showBottom ? 'block' : 'none';
+  }
+
+  function stop() {
+    if (rafId) {
+      cancelAnimationFrame(rafId);
+      rafId = 0;
+    }
+    direction = 0;
+    render();
+  }
+
+  function animateTo(target, dir) {
+    if (rafId) { stop(); return; }     // 滚动中再次点击 = 停止
+
+    var start = window.scrollY;
+    var distance = target - start;
+    if (Math.abs(distance) < 1) { return; }
+
+    if (reduced) {
+      window.scrollTo(0, target);
+      return;
+    }
+
+    // 恒定速度：总时长完全由距离决定，不缓动、不限幅
+    var duration = Math.abs(distance) / SPEED;
+    var startTime = 0;
+    direction = dir;
+
+    function step(now) {
+      if (!startTime) { startTime = now; }
+
+      var progress = Math.min(1, (now - startTime) / duration);
+
+      // 线性推进 → 全程速度恒定
+      window.scrollTo(0, Math.round(start + distance * progress));
+
+      if (progress < 1) {
+        rafId = requestAnimationFrame(step);
+      } else {
+        rafId = 0;
+        direction = 0;
+        render();
       }
+    }
+
+    rafId = requestAnimationFrame(step);
+    render();
+  }
+
+  bottomBtn.addEventListener('click', function () { animateTo(maxScroll, 1); });
+  topBtn.addEventListener('click', function () { animateTo(0, -1); });
+
+  // 动画期间用户主动滚动 → 立刻让出控制权
+  ['wheel', 'touchmove'].forEach(function (type) {
+    window.addEventListener(type, function () {
+      if (rafId) { stop(); }
+    }, { passive: true });
+  });
+
+  window.addEventListener('scroll', render, { passive: true });
+  window.addEventListener('resize', function () { refreshMax(); render(); });
+  window.addEventListener('load', function () { refreshMax(); render(); });
+
+  refreshMax();
+  render();
+})();

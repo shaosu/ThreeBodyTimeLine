@@ -576,6 +576,43 @@
 
     </div>
   </div>
+
+  <script>
+    /* 按纪元自动补全状态类，并标记纪元标题行。
+       时间线数据（.timeline-item）无需改动；
+       要调整「已完成 / 进行中 / 未开始」的归属，只改下面两个数组即可。 */
+    (function () {
+      var COMPLETED = ['magicage', 'goldenage'];              // 已完成
+      var UPCOMING = [                                        // 未开始
+        'prestigeage', 'afterprestigeage', 'broadcastage',
+        'bunkerage', 'galacticage', 'dx3906age', 'universe647'
+      ];
+      // 其余（危机纪元，无纪元 class）视为「进行中」
+
+      var items = document.querySelectorAll('.timeline-item');
+      var i;
+
+      Array.prototype.forEach.call(items, function (item) {
+        var state = 'is-active';
+
+        for (i = 0; i < UPCOMING.length; i++) {
+          if (item.classList.contains(UPCOMING[i])) { state = 'is-upcoming'; break; }
+        }
+        if (state === 'is-active') {
+          for (i = 0; i < COMPLETED.length; i++) {
+            if (item.classList.contains(COMPLETED[i])) { state = 'is-completed'; break; }
+          }
+        }
+        item.classList.add(state);
+
+        // 纪元标题行的内容形如 "(1947年-200X年)"，据此识别并突出显示
+        var content = item.querySelector('.timeline-content');
+        if (content && /^\s*[（(]/.test(content.textContent)) {
+          item.classList.add('is-milestone');
+        }
+      });
+    })();
+  </script>
 </body>
 
 </html>
